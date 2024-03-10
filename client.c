@@ -1,48 +1,61 @@
-#include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
 #define PORT 8080
 
-int main(int argc, char const* argv[])
-{
-	int status, valread, client_fd;
-	struct sockaddr_in serv_addr;
-	char* hello = "Hello from client";
-	char buffer[1024] = { 0 };
-	if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		printf("\n Socket creation error \n");
-		return -1;
-	}
+int main(int argc, char const* argv[]) {
 
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(PORT);
+    struct sockaddr_in address; 
+    bzero(&address, sizeof(address));
 
-	// Convert IPv4 and IPv6 addresses from text to binary
-	// form
-	if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)
-		<= 0) {
-		printf(
-			"\nInvalid address/ Address not supported \n");
-		return -1;
-	}
+    printf("created serv_adress\n");
 
-	if ((status
-		= connect(client_fd, (struct sockaddr*)&serv_addr,
-				sizeof(serv_addr)))
-		< 0) {
-		printf("\nConnection Failed \n");
-		return -1;
-	}
-	send(client_fd, hello, strlen(hello), 0);
-	printf("Hello message sent\n");
-	valread = read(client_fd, buffer,
-				1024 - 1); // subtract 1 for the null
-							// terminator at the end
-	printf("%s\n", buffer);
+    address.sin_family = AF_INET;
+    address.sin_port = htons(PORT);
+    inet_pton(AF_INET, "127.0.0.1", &(address.sin_addr.s_addr));
 
-	// closing the connected socket
-	close(client_fd);
-	return 0;
+    printf("filled address\n");
+
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+
+    printf("created socket\n");
+
+    bind(sock, (struct sockaddr *)&address, sizeof(address));
+
+    printf("binded socket to port\n");
+
+    while (1) {
+        if (connect(sock, (struct sockaddr *)&address, sizeof(address)) == 0) {
+            printf("connected\n");
+            break;
+        } else {
+            char serv_address[1024];
+            bzero(serv_address, sizeof(serv_address));
+            inet_ntop(AF_INET, &(address.sin_addr.s_addr), serv_address, sizeof(serv_address));
+            printf("trying to connect to at %s:%d\n", serv_address, ntohs(address.sin_port));
+            sleep(1);
+        }
+    }
+
+    char fname_recv_buffer[1024];
+
+    while (1) {
+        bzero(fname_recv_buffer, sizeof(fname_recv_buffer));
+        if (read(sock, fname_recv_buffer, sizeof(fname_recv_buffer))) {
+            printf("Recieved from server: %s\n", fname_recv_buffer);
+            break;
+        } else {
+            printf("recieved nothing...\n\n");
+        }
+    }
+
+    printf("client closing connection\n");
+    close(sock);
+    printf("connection closed - client\n");
+
+    return 0;
 }
