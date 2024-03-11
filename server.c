@@ -25,6 +25,12 @@ int main(int argc, char const* argv[]) {
 
     printf("created listener\n");
 
+    printf("waiting for socket to be completely free\n");
+    for (int i = 60; i > 0; i--) {
+        printf("%d seconds left\n", i);
+        sleep(1);
+    }
+
     bind(listener, (struct sockaddr *)&address, sizeof(address));
 
     printf("bound listener to a address\n");
