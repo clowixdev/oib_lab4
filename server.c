@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <stdlib.h>
 
 #define PORT 8080
 
@@ -26,7 +27,7 @@ int main(int argc, char const* argv[]) {
     printf("created listener\n");
 
     printf("waiting for socket to be completely free\n");
-    for (int i = 60; i > 0; i--) {
+    for (int i = 5; i > 0; i--) {
         printf("%d seconds left\n", i);
         sleep(1);
     }

