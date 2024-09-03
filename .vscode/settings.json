@@ -7,6 +7,12 @@
         "stdbool.h": "c",
         "type_traits": "c",
         "glew.h": "c",
-        "glfw3.h": "c"
+        "glfw3.h": "c",
+        "string.h": "c",
+        "in.h": "c",
+        "types.h": "c",
+        "socket.h": "c",
+        "inet.h": "c",
+        "stdlib.h": "c"
     }
 }
