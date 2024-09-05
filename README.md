@@ -18,4 +18,5 @@ During the work two programs were developed and tested in Ubuntu WSL.
     2.  After estabilishing a connection, it sends name of the 
         file thats need to be deleted
     3.  After sending message, closing connection
-###ACCEPTED!
+
+### ACCEPTED!
